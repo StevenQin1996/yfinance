@@ -58,4 +58,5 @@ data can also be retrieved using:
     # (optional, default is None)
     proxy = None)
 
-
+Setup:
+Install PyQT5 and add Qt Designer to external tools in Pycharm

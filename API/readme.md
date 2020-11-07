@@ -60,3 +60,6 @@ data can also be retrieved using:
 
 Setup:
 Install PyQT5 and add Qt Designer to external tools in Pycharm
+From pycharm, Use external tool to open Qt Designer.
+Gui store as .ui file, and can be converted into .py file using PyUIC from external tool. 
+PyUIC: simply click on the .ui file -> click on PyUIC(in external tool)

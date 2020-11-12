@@ -1,3 +1,4 @@
+# use to control UI interaction.
 import sys
 from PyQt5.QtWidgets import QApplication,QMainWindow
 from UI_GUI_Search import *

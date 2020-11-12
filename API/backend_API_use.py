@@ -1,5 +1,7 @@
 import sys
 import pandas as pd
+import pprint
+import json
 import pandas_datareader.data as web
 from pandas_datareader import data as pdr
 import datetime
@@ -15,25 +17,36 @@ def main():
     start = datetime.datetime(2020, 1, 1)
     end = datetime.datetime.today()
 
-    apple = get_data('AAPL',start,end)
-    microsoft = get_data('MSFT', start, end)
-    google = get_data('GOOG', start, end)
+    # apple = get_data('AAPL',start,end)
+    # microsoft = get_data('MSFT', start, end)
+    # google = get_data('GOOG', start, end)
 
-    stocks = pd.DataFrame({"AAPL": apple["Adj Close"],
-                           "MSFT": microsoft["Adj Close"],
-                           "GOOG": google["Adj Close"]})
+    # stocks = pd.DataFrame({"AAPL": apple["Adj Close"],
+    #                        "MSFT": microsoft["Adj Close"],
+    #                        "GOOG": google["Adj Close"]})
 
-    print(stocks.head())  # adj close就是等于adjusted close
+    # print(stocks.head())  # adj close就是等于adjusted close
 
     msft = yf.Ticker("MSFT")
+    data = msft.get_all()
+    pprint.pprint(data)
     # get stock info
-    print(msft.info)
-    print(msft.quarterly_cashflow)
-    print(msft.balance_sheet)
-    print(msft.balance_sheet.loc['Intangible Assets', '2019-06-30'].values)
+    # print(msft.cashflow)
+    # print(msft.earnings)
+    # print(msft.quarterly_cashflow)
+    # print(msft.balance_sheet)
+    # print(msft.balance_sheet.loc['Intangible Assets', '2019-06-30'].values)
 
 
-def get_data(ticker,start,end):
+def write_to_file(filename, my_data):
+    try:
+        with open(filename, 'w') as outfile:
+            json.dump(my_data, outfile)
+    except:
+        print("An exception occurred")
+
+
+def get_data(ticker, start, end):
     # <== that's all it takes :-) to get real time market information. Override
     yf.pdr_override()
     # both methods return identical result
@@ -41,7 +54,6 @@ def get_data(ticker,start,end):
     result2 = pdr.get_data_yahoo(ticker, start=start, end=end)
 
     return result2
-
 
 
 def display_candle(my_dataframe):
@@ -114,6 +126,7 @@ def show_diagram(my_dataframe):
     ax.yaxis.set_major_formatter(ticker.PercentFormatter(xmax=100, decimals=None, symbol='%', is_latex=False))
     ax.set_ylabel("Valuation Change")
     plt.show()
+
 
 if __name__ == '__main__':
     sys.exit(main())

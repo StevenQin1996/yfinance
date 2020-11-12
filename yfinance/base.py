@@ -46,6 +46,7 @@ class TickerBase():
         self._history = None
         self._base_url = 'https://query1.finance.yahoo.com'
         self._scrape_url = 'https://finance.yahoo.com/quote'
+        self._analysis_url = 'https://finance.yahoo.com/quote/{}/analysis'.format(ticker)
 
         self._fundamentals = False
         self._info = None
@@ -72,7 +73,11 @@ class TickerBase():
             "yearly": utils.empty_df(),
             "quarterly": utils.empty_df()}
 
-        self._data = {}
+        self._analysisFundamentals = False
+        self._analysisData = {}
+        self._expectedRevenue = _pd.DataFrame(columns = ["Period","Revenue"])
+        self._expectedEPS = None
+        self._growthRate = None
 
     def history(self, period="1mo", interval="1d",
                 start=None, end=None, prepost=False, actions=True,
@@ -280,12 +285,11 @@ class TickerBase():
         # get info and sustainability
         url = '%s/%s' % (self._scrape_url, self.ticker)
         data = utils.get_json(url, proxy) #this data contain usefule informations
-        #store all data
-        self._data = data
+
         # holders
         url = "{}/{}".format(self._scrape_url, self.ticker)
         holders = _pd.read_html(url+'/holders')
-        
+        print(holders)
         if len(holders)>=3:
             self._major_holders = holders[0]
             self._institutional_holders = holders[1]
@@ -295,10 +299,10 @@ class TickerBase():
             self._institutional_holders = holders[1]
         else:
             self._major_holders = holders[0]
-        
+
         #self._major_holders = holders[0]
         #self._institutional_holders = holders[1]
-        
+
         if self._institutional_holders is not None:
             if 'Date Reported' in self._institutional_holders:
                 self._institutional_holders['Date Reported'] = _pd.to_datetime(
@@ -406,6 +410,34 @@ class TickerBase():
             self._earnings['quarterly'] = df
 
         self._fundamentals = True
+
+    # get analysis data.
+    def _get_analysis(self, kind=None, proxy=None):
+        # setup proxy in requests format
+        if proxy is not None:
+            if isinstance(proxy, dict) and "https" in proxy:
+                proxy = proxy["https"]
+            proxy = {"https": proxy}
+
+        if self._analysisFundamentals:
+            return
+
+        data = utils.get_json(self._analysis_url)
+
+        #get expected revenue
+        for item in data['earningsTrend']['trend']:
+            period = item.get('period', '')
+            revenue = item.get('revenueEstimate','').get('avg','')
+            self._expectedRevenue = self._expectedRevenue.append({'Period': period, 'Revenue': revenue}, ignore_index=True)
+
+        self._analysisFundamentals = True
+
+    def get_expectedRevenue(self, proxy=None, as_dict=False, *args, **kwargs):
+        self._get_analysis(proxy)
+        data = self._expectedRevenue
+        if as_dict:
+            return data.to_dict()
+        return data
 
     def get_recommendations(self, proxy=None, as_dict=False, *args, **kwargs):
         self._get_fundamentals(proxy)
@@ -548,7 +580,6 @@ class TickerBase():
         self._isin = data.split(search_str)[1].split('"')[0].split('|')[0]
         return self._isin
 
-    def get_all(self, proxy=None):
-        self._get_fundamentals(proxy)
-        data = self._data
-        return data
+
+
+

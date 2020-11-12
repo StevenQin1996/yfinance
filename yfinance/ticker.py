@@ -59,6 +59,7 @@ class Ticker(TickerBase):
                 self._expirations[_datetime.datetime.utcfromtimestamp(
                     exp).strftime('%Y-%m-%d')] = exp
             return r['optionChain']['result'][0]['options'][0]
+
         return {}
 
     def _options2df(self, opt, tz=None):
@@ -194,3 +195,14 @@ class Ticker(TickerBase):
         if not self._expirations:
             self._download_options()
         return tuple(self._expirations.keys())
+
+    # trying to get analyst prediction for finance api
+    # return all data form API
+    @property
+    def expectedRevenue(self):
+        return self.get_expectedRevenue()
+
+    # @property
+    # def history(self):
+    #     return self.get_history()
+    #

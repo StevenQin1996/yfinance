@@ -552,5 +552,3 @@ class TickerBase():
         self._get_fundamentals(proxy)
         data = self._data
         return data
-
-

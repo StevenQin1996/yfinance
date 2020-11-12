@@ -2,7 +2,6 @@ import sys
 import pandas as pd
 import pprint
 import json
-import pandas_datareader.data as web
 from pandas_datareader import data as pdr
 import datetime
 import yfinance as yf
@@ -25,11 +24,9 @@ def main():
     #                        "MSFT": microsoft["Adj Close"],
     #                        "GOOG": google["Adj Close"]})
 
-    # print(stocks.head())  # adj close就是等于adjusted close
 
     msft = yf.Ticker("MSFT")
-    data = msft.get_all()
-    pprint.pprint(data)
+    print(msft.expectedRevenue)
     # get stock info
     # print(msft.cashflow)
     # print(msft.earnings)

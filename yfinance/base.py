@@ -26,7 +26,6 @@ import datetime as _datetime
 import requests as _requests
 import pandas as _pd
 import numpy as _np
-
 try:
     from urllib.parse import quote as urlencode
 except ImportError:
@@ -72,6 +71,8 @@ class TickerBase():
         self._cashflow = {
             "yearly": utils.empty_df(),
             "quarterly": utils.empty_df()}
+
+        self._data = {}
 
     def history(self, period="1mo", interval="1d",
                 start=None, end=None, prepost=False, actions=True,
@@ -278,12 +279,11 @@ class TickerBase():
 
         # get info and sustainability
         url = '%s/%s' % (self._scrape_url, self.ticker)
-        data = utils.get_json(url, proxy)
-
+        data = utils.get_json(url, proxy) #this data contain usefule informations
+        #store all data
+        self._data = data
         # holders
-        # url = "{}/{}/holders".format(self._scrape_url, self.ticker)
-        # holders = _pd.read_html(url)
-        url = "{}/{}".format(self._scrape_url, self.ticker) 
+        url = "{}/{}".format(self._scrape_url, self.ticker)
         holders = _pd.read_html(url+'/holders')
         
         if len(holders)>=3:
@@ -547,3 +547,10 @@ class TickerBase():
 
         self._isin = data.split(search_str)[1].split('"')[0].split('|')[0]
         return self._isin
+
+    def get_all(self, proxy=None):
+        self._get_fundamentals(proxy)
+        data = self._data
+        return data
+
+

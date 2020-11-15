@@ -26,7 +26,7 @@ def main():
 
 
     msft = yf.Ticker("MSFT")
-    print(msft.expectedRevenue)
+    print(msft.expectedGrowth)
     # get stock info
     # print(msft.cashflow)
     # print(msft.earnings)

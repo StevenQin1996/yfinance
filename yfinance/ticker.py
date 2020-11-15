@@ -202,7 +202,8 @@ class Ticker(TickerBase):
     def expectedRevenue(self):
         return self.get_expectedRevenue()
 
-    # @property
-    # def history(self):
-    #     return self.get_history()
-    #
+    # use five year growth rate for prediction.
+    @property
+    def expectedGrowth(self):
+        data = self.get_expectedGrowthRate()
+        return data.loc[data['Period'] == '+5y', 'Growth'].item()

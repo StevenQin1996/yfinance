@@ -75,7 +75,7 @@ class TickerBase():
 
         self._analysisFundamentals = False
         self._analysisData = {}
-        self._expectedRevenue = _pd.DataFrame(columns = ["Period","Revenue"])
+        self._expectedRevenue = _pd.DataFrame(columns = ["Period","Revenue", "Growth"])
         self._expectedEPS = None
         self._growthRate = None
 
@@ -428,13 +428,22 @@ class TickerBase():
         for item in data['earningsTrend']['trend']:
             period = item.get('period', '')
             revenue = item.get('revenueEstimate','').get('avg','')
-            self._expectedRevenue = self._expectedRevenue.append({'Period': period, 'Revenue': revenue}, ignore_index=True)
+            growth = item.get('growth', '')
+            self._expectedRevenue = self._expectedRevenue.append({'Period': period, 'Revenue': revenue, 'Growth': growth}, ignore_index=True)
 
         self._analysisFundamentals = True
 
+    # use pandas.copy() to aviod changing data would change self._expectedRevenue
     def get_expectedRevenue(self, proxy=None, as_dict=False, *args, **kwargs):
         self._get_analysis(proxy)
-        data = self._expectedRevenue
+        data = self._expectedRevenue[["Period","Revenue"]].copy()
+        if as_dict:
+            return data.to_dict()
+        return data
+
+    def get_expectedGrowthRate(self, proxy=None, as_dict=False, *args, **kwargs):
+        self._get_analysis(proxy)
+        data = self._expectedRevenue[["Period","Growth"]].copy()
         if as_dict:
             return data.to_dict()
         return data

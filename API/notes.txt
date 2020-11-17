@@ -1,0 +1,7 @@
+按钮控件：
+    基本使用： 是梨花一个按钮举例
+    btn = QPushButton("Search", w)
+    格式：
+        声明定义一个实例化对象的名称 = QPushButton（按钮文字，父容器）
+    可以通过move函数来移动button在父容器中的位置
+

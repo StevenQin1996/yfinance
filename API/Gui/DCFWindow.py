@@ -6,8 +6,9 @@ from PyQt5.QtGui import QIcon, QFont
 import PyQt5.Qt as Qt
 
 class DCFWindow(QWidget):
-    def __init__(self):
+    def __init__(self, ticker):
         super().__init__()  # initialzie super class
+        self.ticker = ticker
         self.width = 400
         self.height = 300
         self.iniUI()
@@ -109,7 +110,8 @@ class DCFWindow(QWidget):
     # must initialize this list
     windowList = []
     def switchWindow(self):
-        newScreen = GrowthWindow.GrowthWindow()
+        # print("DCF: {}".format(self.ticker))
+        newScreen = GrowthWindow.GrowthWindow(self.ticker)
         self.windowList.append(newScreen)
         self.close()
 
@@ -118,16 +120,8 @@ class DCFWindow(QWidget):
         self.windowList.append(newScreen)
         self.close()
 
-
     def center(self):
         qr = self.frameGeometry()
         cp = QDesktopWidget().availableGeometry().center()
         qr.moveCenter(cp)
         self.move(qr.topLeft())
-
-
-# if __name__ == "__main__":
-#     app = QApplication(sys.argv)  # 进程：管理所有窗口
-#     mc = DCFWindow()
-#     app.exec_()  # 监听窗口事件
-

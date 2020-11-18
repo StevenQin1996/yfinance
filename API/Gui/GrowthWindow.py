@@ -6,13 +6,15 @@ from PyQt5.QtGui import QIcon, QFont
 import PyQt5.Qt as Qt
 
 class GrowthWindow(QWidget):
-    def __init__(self):
+    def __init__(self, ticker):
         super().__init__()  # initialzie super class
+        self.ticker = ticker
         self.width = 400
         self.height = 300
         self.iniUI()
 
     def iniUI(self):
+        # print(self.ticker)
         self.setWindowTitle("Growth Valuation")
         self.resize(self.width, self.height)
 
@@ -110,7 +112,8 @@ class GrowthWindow(QWidget):
     windowList = []
 
     def switchWindow(self):
-        newScreen = DCFWindow.DCFWindow()
+        # print("GW: {}".format(self.ticker))
+        newScreen = DCFWindow.DCFWindow(self.ticker)
         self.windowList.append(newScreen)
         self.close()
 
@@ -124,9 +127,3 @@ class GrowthWindow(QWidget):
         cp = QDesktopWidget().availableGeometry().center()
         qr.moveCenter(cp)
         self.move(qr.topLeft())
-
-# if __name__ == "__main__":
-#     app = QApplication(sys.argv)  # 进程：管理所有窗口
-#     mc = GrowthWindow()
-#     app.exec_()  # 监听窗口事件
-#

@@ -27,7 +27,6 @@ class SearchClass(QWidget):
         # 输入
         labelTicker = QLabel("Enter Stock Ticker: ", self)
         entryTicker = QLineEdit(self)
-
         # 网格布局
         hlayout = QHBoxLayout(self)  # 水平布局
         hlayout.addWidget(labelTicker)
@@ -36,14 +35,15 @@ class SearchClass(QWidget):
 
 
         # connect 连接槽，也可以理解为方法
-        searchButton.clicked.connect(self.search)
+        searchButton.clicked.connect(lambda: self.search(str.upper(entryTicker.text())))
+        entryTicker.editingFinished.connect(lambda: self.search(str.upper(entryTicker.text())))
 
         self.center()
         self.show()
 
     windowList = []
-    def search(self):
-        newScreen = GrowthWindow.GrowthWindow()
+    def search(self, ticker):
+        newScreen = GrowthWindow.GrowthWindow(ticker)
         self.windowList.append(newScreen)
         self.close()
 

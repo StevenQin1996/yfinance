@@ -19,7 +19,7 @@ class Company:
         self.free_cash_flow = [x/1000000 for x in self.__data.cashflow.loc[['Total Cash From Operating Activities']].values.tolist()[0][::-1]]
 
         self.revenue = [x/1000000 for x in self.__data.financials.loc[['Total Revenue']].values.tolist()[0]][::-1]
-        self.net_income = [x/1000000 for x in self.__data.financials.loc[['Net Income']].values.tolist()[0]][::-1] # different data?
+        self.net_income = [x/1000000 for x in self.__data.financials.loc[['Net Income']].values.tolist()[0]][::-1]
         self.net_profit_margins = [x/y for x, y in zip(self.net_income, self.revenue)]
         self.fcf_to_profit_margins = [x/y for x, y in zip(self.free_cash_flow, self.net_income)]
 
@@ -36,6 +36,7 @@ class Company:
 
         self.updateDCFModel()
         self.updateGrowthModel()
+        self.getSuggestedModel()
 
     def updateDCFModel(self):
         pft_margin = self.avg_profit_margin if self._ad_profit_margin is None else self._ad_profit_margin
@@ -69,6 +70,14 @@ class Company:
 
         self.fair_value_of_price = self.projected_share_price/pow(1+self.personal_required_return_rate, 5)
         self.profit_margin = self.fair_value_of_price/self.todays_share_price - 1
+
+    def getSuggestedModel(self):
+        if(sum(e > 0 for e in self.free_cash_flow)>=3 and self.avg_fcf_to_profit_margin > 0):
+            return 'DCF'
+        elif(self.eps > 0 or self.eps_e[1] > 0):
+            return 'GROWTH'
+        else:
+            return 'NA'
 
     @property
     def ad_profit_margin(self):
@@ -119,9 +128,17 @@ class Company:
 
 if __name__ == '__main__':
     try:
-        tick = yf.Ticker("MSFT")
+        tick = yf.Ticker("TSLA")
     except:
         print("No Company Ticker Found.")
         exit(0)
     comp = Company(tick)
-    pprint.PrettyPrinter(indent=4).pprint(comp.pe_ratio_e)
+    # pprint.PrettyPrinter(indent=4).pprint(comp.pe_ratio_e)
+    suggestedModel = comp.getSuggestedModel()
+    if(suggestedModel == 'DCF'):
+        print(comp.fair_value_of_equity)
+    elif(suggestedModel == 'GROWTH'):
+        print(comp.fair_value_of_price)
+    else:
+        print('傻逼公司')
+    

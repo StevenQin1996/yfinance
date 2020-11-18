@@ -1,4 +1,5 @@
 import sys
+from Gui import GrowthWindow, DCFWindow
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QToolTip, QMessageBox, QDesktopWidget, QVBoxLayout, \
     QHBoxLayout, QLineEdit, QGridLayout, QLabel
 from PyQt5.QtGui import QIcon, QFont
@@ -15,7 +16,6 @@ class SearchClass(QWidget):
     def iniUI(self):
         QToolTip.setFont(QFont("Times", 12, QFont.Black))
         self.setWindowTitle("Search Home")
-        app.setWindowIcon(QIcon("../image/icon.png"))
 
         self.resize(self.width, self.height)
 
@@ -29,22 +29,24 @@ class SearchClass(QWidget):
         entryTicker = QLineEdit(self)
 
         # 网格布局
-        #
         hlayout = QHBoxLayout(self)  # 水平布局
-        # hlayout.addStretch(1)
         hlayout.addWidget(labelTicker)
         hlayout.addWidget(entryTicker)
         hlayout.addWidget(searchButton)
-        # hlayout.addStretch(1)
-        # hlayout.setSpacing(20)
-        # self.setLayout(hlayout)
 
 
         # connect 连接槽，也可以理解为方法
-        searchButton.clicked.connect(self.close)
+        searchButton.clicked.connect(self.search)
 
         self.center()
         self.show()
+
+    windowList = []
+    def search(self):
+        newScreen = GrowthWindow.GrowthWindow()
+        self.windowList.append(newScreen)
+        self.close()
+
 
     def center(self):
         qr = self.frameGeometry()
@@ -52,18 +54,8 @@ class SearchClass(QWidget):
         qr.moveCenter(cp)
         self.move(qr.topLeft())
 
-    # overload from self.close
-    def closeEvent(self, event):
-        result = QMessageBox.question(self, "Attention: ", "Search for ticker", QMessageBox.Yes | QMessageBox.No,
-                                      QMessageBox.Yes)
-        if result == QMessageBox.Yes:
-            print(dir(event))
-            event.accept()
-        else:
-            event.ignore()
-
-
 if __name__ == "__main__":
     app = QApplication(sys.argv)  # 进程：管理所有窗口
-    mc = SearchClass()
+    app.setWindowIcon(QIcon("/Users/shiyunqin/Desktop/Homework/Projects/估值模版/yfinance/API/Gui/image/icon2.png"))
+    ex = SearchClass()
     app.exec_()  # 监听窗口事件

@@ -1,11 +1,11 @@
 import sys
-from Gui import GrowthWindow, SearchWindow
+from Gui import DCFWindow, SearchWindow
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QToolTip, QMessageBox, QDesktopWidget, QVBoxLayout, \
     QHBoxLayout, QLineEdit, QGridLayout, QLabel, QFrame
 from PyQt5.QtGui import QIcon, QFont
 import PyQt5.Qt as Qt
 
-class DCFWindow(QWidget):
+class GrowthWindow(QWidget):
     def __init__(self):
         super().__init__()  # initialzie super class
         self.width = 400
@@ -13,7 +13,7 @@ class DCFWindow(QWidget):
         self.iniUI()
 
     def iniUI(self):
-        self.setWindowTitle("Discount Cash Flow")
+        self.setWindowTitle("Growth Valuation")
         self.resize(self.width, self.height)
 
         lbl_ticker = QLabel("Ticker: ")
@@ -60,9 +60,10 @@ class DCFWindow(QWidget):
         le_shareprice.setText("placeholder")
 
         # report section
-        grid=QGridLayout(self)
-        grid.addWidget(lbl_ticker,0,0)
-        grid.addWidget(le_ticker,0,1)
+        grid = QGridLayout(self)
+
+        grid.addWidget(lbl_ticker, 0, 0)
+        grid.addWidget(le_ticker, 0, 1)
         grid.addWidget(lbl_profit_margin, 1, 0)
         grid.addWidget(le_profit_margin, 1, 1)
         grid.addWidget(lbl_growth_rate, 2, 0)
@@ -83,7 +84,7 @@ class DCFWindow(QWidget):
         btn_customize = QPushButton("Customize", self)
         btn_customize.setToolTip("customize")
         btn_swithMode = QPushButton("Swtich", self)
-        btn_swithMode.setToolTip("Switch to Growth Model")
+        btn_swithMode.setToolTip("Switch to DCF Model")
 
         hlayout = QHBoxLayout()  # 水平布局
         hlayout.addStretch(1)
@@ -106,10 +107,10 @@ class DCFWindow(QWidget):
         self.center()
         self.show()
 
-    # must initialize this list
     windowList = []
+
     def switchWindow(self):
-        newScreen = GrowthWindow.GrowthWindow()
+        newScreen = DCFWindow.DCFWindow()
         self.windowList.append(newScreen)
         self.close()
 
@@ -118,16 +119,14 @@ class DCFWindow(QWidget):
         self.windowList.append(newScreen)
         self.close()
 
-
     def center(self):
         qr = self.frameGeometry()
         cp = QDesktopWidget().availableGeometry().center()
         qr.moveCenter(cp)
         self.move(qr.topLeft())
 
-
 # if __name__ == "__main__":
 #     app = QApplication(sys.argv)  # 进程：管理所有窗口
-#     mc = DCFWindow()
+#     mc = GrowthWindow()
 #     app.exec_()  # 监听窗口事件
-
+#

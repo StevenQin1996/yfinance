@@ -75,7 +75,7 @@ class TickerBase():
 
         self._analysisFundamentals = False
         self._analysisData = {}
-        self._expectedRevenue = _pd.DataFrame(columns = ["Period","Revenue", "Growth"])
+        self._expectedRevenue = _pd.DataFrame(columns = ["Period","Revenue", "Growth","EPS"])
         self._expectedEPS = None
         self._growthRate = None
 
@@ -289,7 +289,6 @@ class TickerBase():
         # holders
         url = "{}/{}".format(self._scrape_url, self.ticker)
         holders = _pd.read_html(url+'/holders')
-        print(holders)
         if len(holders)>=3:
             self._major_holders = holders[0]
             self._institutional_holders = holders[1]
@@ -429,7 +428,8 @@ class TickerBase():
             period = item.get('period', '')
             revenue = item.get('revenueEstimate','').get('avg','')
             growth = item.get('growth', '')
-            self._expectedRevenue = self._expectedRevenue.append({'Period': period, 'Revenue': revenue, 'Growth': growth}, ignore_index=True)
+            eps = item.get('earningsEstimate','').get('avg','')
+            self._expectedRevenue = self._expectedRevenue.append({'Period': period, 'Revenue': revenue, 'Growth': growth, 'EPS': eps}, ignore_index=True)
 
         self._analysisFundamentals = True
 
@@ -444,6 +444,13 @@ class TickerBase():
     def get_expectedGrowthRate(self, proxy=None, as_dict=False, *args, **kwargs):
         self._get_analysis(proxy)
         data = self._expectedRevenue[["Period","Growth"]].copy()
+        if as_dict:
+            return data.to_dict()
+        return data
+
+    def get_expectedEPS(self, proxy=None, as_dict=False, *args, **kwargs):
+        self._get_analysis(proxy)
+        data = self._expectedRevenue[["Period","EPS"]].copy()
         if as_dict:
             return data.to_dict()
         return data

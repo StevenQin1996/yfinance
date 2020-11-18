@@ -207,3 +207,16 @@ class Ticker(TickerBase):
     def expectedGrowth(self):
         data = self.get_expectedGrowthRate()
         return data.loc[data['Period'] == '+5y', 'Growth'].item()
+
+    '''
+        Yahoo API predicts eps for current year and next year y0 and y1
+        use accordingly with defined growth rate to calculate +1, +2, +3years eps.
+    '''
+    @property
+    def expectedEPS(self):
+        data = self.get_expectedEPS()
+        tempdata = _pd.DataFrame(columns = ["Period","EPS"])
+        tempdata = tempdata.append(data.loc[data['Period'] == '0y'])
+        tempdata = tempdata.append(data.loc[data['Period'] == '+1y'])
+
+        return tempdata

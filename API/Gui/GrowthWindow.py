@@ -14,7 +14,7 @@ class GrowthWindow(QWidget):
         self.iniUI()
 
     def iniUI(self):
-        # print(self.ticker)
+        print(self.ticker)
         self.setWindowTitle("Growth Valuation")
         self.resize(self.width, self.height)
 

@@ -36,7 +36,11 @@ class SearchClass(QWidget):
 
         # connect 连接槽，也可以理解为方法
         searchButton.clicked.connect(lambda: self.search(str.upper(entryTicker.text())))
-        entryTicker.editingFinished.connect(lambda: self.search(str.upper(entryTicker.text())))
+
+        '''
+        need to figure out why editingFished() pass data twice.
+        '''
+        # entryTicker.editingFinished.connect(lambda: self.search(str.upper(entryTicker.text())))
 
         self.center()
         self.show()

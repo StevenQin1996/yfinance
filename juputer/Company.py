@@ -61,7 +61,7 @@ class Company:
         gth_rate = self.growth_rate if self._ad_growth_rate is None else self._ad_growth_rate
 
         self.eps = (self.__data.earnings['Earnings'].iloc[-1]/1000000)/self.shares_outstanding
-        self.eps_e = [0] + [0*pow(1+gth_rate, x) for x in range(4)] # not finished yet
+        self.eps_e = [self.__data.expectedEPS.loc[self.__data.expectedEPS['Period'] == '0y', 'EPS'].item()] + [self.__data.expectedEPS.loc[self.__data.expectedEPS['Period'] == '+1y', 'EPS'].item()*pow(1+gth_rate, x) for x in range(4)]
 
         self.pe_ratio = self.todays_share_price/self.eps
         self.pe_ratio_e = PE_Lookup[round(min(0.5, max(0.05, gth_rate)), 2)]
@@ -141,4 +141,3 @@ if __name__ == '__main__':
         print(comp.fair_value_of_price)
     else:
         print('傻逼公司')
-    

@@ -137,7 +137,15 @@ if __name__ == '__main__':
     suggestedModel = comp.getSuggestedModel()
     if(suggestedModel == 'DCF'):
         print(comp.fair_value_of_equity)
+
+        # 这里相当于改变表格里蓝色格子的值，结果会自动更新。所有用了setter的变量都可以这样操作
+        comp.personal_required_return_rate = 0.9
+        print(comp.fair_value_of_equity)
     elif(suggestedModel == 'GROWTH'):
+        print(comp.fair_value_of_price)
+
+        # 同上
+        comp.ad_growth_rate = 2.0
         print(comp.fair_value_of_price)
     else:
         print('傻逼公司')

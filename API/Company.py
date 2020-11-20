@@ -11,7 +11,7 @@ class Company:
         self.__data = data
         self.name = self.__data.info['shortName']
         self.ticker = self.__data.ticker
-
+        self.suggestModel = None
         self._perpetual_growth_rate = 0.025
         self.shares_outstanding = self.__data.info['sharesOutstanding']/1000000
 
@@ -43,8 +43,8 @@ class Company:
         fcf_pft_margin = self.avg_fcf_to_profit_margin if self._ad_fcf_to_profit_margin is None else self._ad_fcf_to_profit_margin
         gth_rate = self.growth_rate if self._ad_growth_rate is None else self._ad_growth_rate
 
-        y0 = self.__data.expectedRevenue.loc[tick.expectedRevenue['Period'] == '0y', 'Revenue'].item()/1000000
-        y1 = self.__data.expectedRevenue.loc[tick.expectedRevenue['Period'] == '+1y', 'Revenue'].item()/1000000
+        y0 = self.__data.expectedRevenue.loc[self.__data.expectedRevenue['Period'] == '0y', 'Revenue'].item()/1000000
+        y1 = self.__data.expectedRevenue.loc[self.__data.expectedRevenue['Period'] == '+1y', 'Revenue'].item()/1000000
         self.revenue_e = [y0] + [y1*pow(1+gth_rate, x) for x in range(3)]
         self.net_income_e = [x * pft_margin for x in self.revenue_e]
         self.free_cash_flow_e = [x * fcf_pft_margin for x in self.net_income_e]
@@ -55,7 +55,7 @@ class Company:
 
         self.todays_value = sum(self.pv_of_future_cash_flow) + (self.ternimal_value/self.discount_factor[-1])
 
-        self.fair_value_of_equity = self.todays_value/self.shares_outstanding
+        self.fair_value_of_equity_DCF = self.todays_value/self.shares_outstanding
 
     def updateGrowthModel(self):
         gth_rate = self.growth_rate if self._ad_growth_rate is None else self._ad_growth_rate
@@ -68,16 +68,19 @@ class Company:
         self.projected_share_price = self.pe_ratio_e * self.eps_e[-1]
         self.annual_return_pa = pow(self.projected_share_price/self.todays_share_price, 0.2) - 1
 
-        self.fair_value_of_price = self.projected_share_price/pow(1+self.personal_required_return_rate, 5)
-        self.profit_margin = self.fair_value_of_price/self.todays_share_price - 1
+        self.fair_value_of_equity_Growth = self.projected_share_price/pow(1+self.personal_required_return_rate, 5)
+        self.profit_margin = self.fair_value_of_equity_Growth/self.todays_share_price - 1
 
     def getSuggestedModel(self):
-        if(sum(e > 0 for e in self.free_cash_flow)>=3 and self.avg_fcf_to_profit_margin > 0):
-            return 'DCF'
-        elif(self.eps > 0 or self.eps_e[1] > 0):
-            return 'GROWTH'
-        else:
-            return 'NA'
+        if self.suggestModel is None:
+            if sum(e > 0 for e in self.free_cash_flow)>=3 and self.avg_fcf_to_profit_margin > 0:
+                self.suggestModel = 'DCF'
+            elif self.eps > 0 or self.eps_e[1] > 0:
+                self.suggestModel = 'GROWTH'
+        #     else:
+        #         return 'NA'
+        # else:
+        return self.suggestModel
 
     @property
     def ad_profit_margin(self):
@@ -128,7 +131,7 @@ class Company:
 
 if __name__ == '__main__':
     try:
-        tick = yf.Ticker("TSLA")
+        tick = yf.Ticker("ET")
     except:
         print("No Company Ticker Found.")
         exit(0)
@@ -136,16 +139,17 @@ if __name__ == '__main__':
     # pprint.PrettyPrinter(indent=4).pprint(comp.pe_ratio_e)
     suggestedModel = comp.getSuggestedModel()
     if(suggestedModel == 'DCF'):
-        print(comp.fair_value_of_equity)
+        print("DCF: Fair value ${}".format(comp.fair_value_of_equity_DCF))
 
         # 这里相当于改变表格里蓝色格子的值，结果会自动更新。所有用了setter的变量都可以这样操作
         comp.personal_required_return_rate = 0.9
-        print(comp.fair_value_of_equity)
+        print("DCF: Customized growth fair value ${}".format(comp.fair_value_of_equity_DCF))
+        print(comp.fair_value_of_equity_DCF)
     elif(suggestedModel == 'GROWTH'):
-        print(comp.fair_value_of_price)
+        print(comp.fair_value_of_equity_Growth)
 
         # 同上
         comp.ad_growth_rate = 2.0
-        print(comp.fair_value_of_price)
+        print(comp.fair_value_of_equity_Growth)
     else:
         print('傻逼公司')

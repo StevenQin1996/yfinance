@@ -46,7 +46,7 @@ class DCFWindow(QWidget):
         le_perpetual_growth = QLabel(self)
         le_perpetual_growth.setFrameStyle(QFrame.Panel | QFrame.Sunken)
         le_perpetual_growth.setLineWidth(2)
-        le_perpetual_growth.setText("{:.2f}%".format(self.ticker.growth_rate * 100))
+        le_perpetual_growth.setText("{:.2f}%".format(self.ticker._perpetual_growth_rate * 100))
 
         le_eps = QLabel(self)
         le_eps.setFrameStyle(QFrame.Panel | QFrame.Sunken)
